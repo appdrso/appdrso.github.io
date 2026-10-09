@@ -2,36 +2,138 @@
 <html lang="pt-BR">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="referrer" content="no-referrer">
   <meta name="robots" content="noindex, nofollow">
-  <meta http-equiv="refresh" content="0; url=https://script.google.com/macros/s/AKfycbzUTpcAv8pB1Je0YexaMLozmBg5_H90lpj4FZGD2HDTdAxfmd36-qBFVGBGFz11cOqo/exec">
-  <title>DRSO — Abrir aplicativo</title>
+  <meta name="theme-color" content="#173e32">
+  <title>DRSO — Acesso</title>
   <style>
     :root { color-scheme: light; font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; color: #173e32; background: #f5f4ee; }
     * { box-sizing: border-box; }
+    [hidden] { display: none !important; }
     body { margin: 0; min-height: 100vh; min-height: 100svh; display: grid; place-items: center; padding: 24px; }
-    main { width: 100%; max-width: 440px; padding: 36px 28px; border: 1px solid #deded3; border-top: 4px solid #b78f3b; border-radius: 20px; background: #fff; box-shadow: 0 16px 48px #173e3210; }
+    body.app-ready { overflow: hidden; padding: 0; }
+    #app-frame { position: fixed; inset: 0; width: 100%; height: 100%; height: 100dvh; border: 0; background: #f5f4ee; }
+    #embed-status { width: 100%; max-width: 440px; padding: 36px 28px; border: 1px solid #deded3; border-top: 4px solid #b78f3b; border-radius: 20px; background: #fff; box-shadow: 0 16px 48px #173e3210; }
     .brand { margin: 0 0 8px; font: 700 42px/1.15 Georgia, serif; letter-spacing: .03em; }
     .subtitle { margin: 0 0 28px; color: #596b63; font-size: 14px; line-height: 1.6; }
     h1 { margin: 0 0 12px; font-size: 22px; line-height: 1.35; }
     p { margin: 0 0 24px; color: #596b63; line-height: 1.6; }
-    a { display: flex; align-items: center; justify-content: center; min-height: 52px; padding: 14px 20px; border-radius: 12px; background: #174f3b; color: #fff; font-weight: 650; text-align: center; text-decoration: none; }
-    a:hover { background: #103b2c; }
-    a:focus-visible { outline: 3px solid #b78f3b; outline-offset: 4px; }
-    @media (max-width: 360px) { main { padding: 28px 20px; } }
+    #direct-link { display: flex; align-items: center; justify-content: center; min-height: 52px; padding: 14px 20px; border-radius: 12px; background: #174f3b; color: #fff; font-weight: 650; text-align: center; text-decoration: none; }
+    #direct-link:hover { background: #103b2c; }
+    #direct-link:focus-visible { outline: 3px solid #b78f3b; outline-offset: 4px; }
+    .spinner { display: block; width: 28px; height: 28px; margin: 0 0 20px; border: 3px solid #e4e9df; border-top-color: #174f3b; border-radius: 50%; animation: spin 1s linear infinite; }
+    .help { margin: 16px 0 0; color: #66736b; font-size: 12px; line-height: 1.6; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    @media (prefers-reduced-motion: reduce) { .spinner { animation: none; } }
+    @media (max-width: 360px) { body { padding: 18px; } #embed-status { padding: 28px 20px; } }
   </style>
-  <script>
-    window.location.replace("https://script.google.com/macros/s/AKfycbzUTpcAv8pB1Je0YexaMLozmBg5_H90lpj4FZGD2HDTdAxfmd36-qBFVGBGFz11cOqo/exec");
-  </script>
 </head>
 <body>
-  <main>
+  <main id="embed-status">
     <p class="brand" aria-label="DRSO">DRSO</p>
     <p class="subtitle">Voluntariado para serviços extras</p>
-    <h1>Abrindo o aplicativo…</h1>
-    <p>Se o aplicativo não abrir automaticamente, use o botão abaixo.</p>
-    <a href="https://script.google.com/macros/s/AKfycbzUTpcAv8pB1Je0YexaMLozmBg5_H90lpj4FZGD2HDTdAxfmd36-qBFVGBGFz11cOqo/exec" referrerpolicy="no-referrer">Abrir o aplicativo</a>
+    <span id="loading-spinner" class="spinner" aria-hidden="true"></span>
+    <div role="status" aria-live="polite" aria-atomic="true">
+      <h1 id="status-title">Abrindo o DRSO…</h1>
+      <p id="status-message">Aguarde um instante para acessar o aplicativo.</p>
+    </div>
+    <a id="direct-link" href="https://script.google.com/macros/s/AKfycbzUTpcAv8pB1Je0YexaMLozmBg5_H90lpj4FZGD2HDTdAxfmd36-qBFVGBGFz11cOqo/exec" target="_blank" rel="noopener noreferrer" referrerpolicy="no-referrer">Abrir diretamente</a>
+    <p class="help">Se precisar, o botão abre o mesmo aplicativo em uma nova aba.</p>
+    <noscript><p class="help">Ative o JavaScript para abrir o aplicativo nesta página.</p></noscript>
   </main>
+  <iframe id="app-frame" title="DRSO — Gestão de Voluntariado" hidden aria-hidden="true" referrerpolicy="no-referrer"></iframe>
+  <script>
+    (function () {
+      'use strict';
+      var HOST_ORIGIN = 'https://appdrso.github.io';
+      var APP_URL = 'https://script.google.com/macros/s/AKfycbzUTpcAv8pB1Je0YexaMLozmBg5_H90lpj4FZGD2HDTdAxfmd36-qBFVGBGFz11cOqo/exec';
+      var frame = document.getElementById('app-frame');
+      var status = document.getElementById('embed-status');
+      var spinner = document.getElementById('loading-spinner');
+      var approved = null;
+      var timeout = null;
+
+      function showFallback(title, message) {
+        document.getElementById('status-title').textContent = title;
+        document.getElementById('status-message').textContent = message;
+        spinner.hidden = true;
+      }
+
+      // A copied or itself embedded host must not approve the application's
+      // startup. The iframe has no src until this check has passed.
+      if (window.self !== window.top || window.location.origin !== HOST_ORIGIN) {
+        showFallback('Abra o DRSO diretamente', 'Use o botão abaixo para acessar o aplicativo.');
+        return;
+      }
+
+      function googleOrigin(origin) {
+        if (typeof origin !== 'string') return false;
+        try {
+          var url = new URL(origin);
+          return url.origin === origin && url.protocol === 'https:' && !url.port &&
+            (url.hostname === 'script.google.com' || url.hostname.endsWith('.googleusercontent.com'));
+        } catch (error) { return false; }
+      }
+
+      // Apps Script places the application inside its own sandbox iframe.
+      // WindowProxy frames, length and numeric indices are cross-origin
+      // accessible; no remote DOM or location is read. Bound traversal even
+      // if a frame changes or closes while its message is being handled.
+      function containsSender(source) {
+        if (!source) return false;
+        var pending = [{value: frame.contentWindow, depth: 0}];
+        var seen = [];
+        var checked = 0;
+        while (pending.length && checked < 24) {
+          var entry = pending.shift();
+          var current = entry.value;
+          if (!current || seen.indexOf(current) !== -1) continue;
+          seen.push(current);
+          checked++;
+          if (current === source) return true;
+          if (entry.depth >= 4) continue;
+          try {
+            var count = Math.min(current.length, 24);
+            for (var index = 0; index < count && pending.length < 24; index++) {
+              pending.push({value: current.frames[index], depth: entry.depth + 1});
+            }
+          } catch (error) { /* A vanished or inaccessible branch cannot match. */ }
+        }
+        return false;
+      }
+
+      window.addEventListener('message', function (event) {
+        var data = event.data;
+        if (!data || typeof data !== 'object' || Array.isArray(data) || data.version !== 1 ||
+            typeof data.nonce !== 'string' || !/^[0-9a-f]{32}$/.test(data.nonce) ||
+            (data.type !== 'drso:embed:hello' && data.type !== 'drso:embed:ready') ||
+            !googleOrigin(event.origin) || !containsSender(event.source)) return;
+
+        if (data.type === 'drso:embed:hello') {
+          approved = {source: event.source, origin: event.origin, nonce: data.nonce};
+          try {
+            event.source.postMessage({type: 'drso:embed:allow', version: 1, nonce: data.nonce}, event.origin);
+          } catch (error) { approved = null; }
+          return;
+        }
+
+        if (!approved || event.source !== approved.source || event.origin !== approved.origin ||
+            data.nonce !== approved.nonce) return;
+        window.clearTimeout(timeout);
+        frame.hidden = false;
+        frame.removeAttribute('aria-hidden');
+        status.hidden = true;
+        document.body.classList.add('app-ready');
+      });
+
+      // A load event also fires for some blocked frames. Only the application's
+      // nonce-bound READY message confirms that this view can be displayed.
+      timeout = window.setTimeout(function () {
+        showFallback('O acesso está demorando', 'Você pode aguardar mais um pouco ou abrir o aplicativo pelo botão abaixo.');
+      }, 20000);
+      frame.src = APP_URL + '?embed=1';
+    }());
+  </script>
 </body>
 </html>
