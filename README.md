@@ -1,15 +1,21 @@
-# DRSO — Gestão de Voluntariedade
+# Host público DRSO
 
-Host público do aplicativo do 5º CRPM. [Abrir DRSO](https://appdrso.github.io/).
+Espelho dos dois pontos de entrada de `appdrso/appdrso.github.io`. Ambos devem ter o mesmo conteúdo.
 
-`index.html` e `acesso.html` incorporam a mesma implantação Apps Script, validando origem, fonte e nonce. Dados e autenticação permanecem no aplicativo. Publicar este host não atualiza a implantação do Google Apps Script, feita manualmente pelo proprietário.
+O favicon ativo é `assets/favicon-16-v0861.png`: cópia exata do PNG incorporado no HTML anterior à edição 0.8.6.0. `favicon.ico` contém essa mesma imagem. Os ícones de instalação permanecem na família `v0860`, incluindo `assets/apple-touch-icon-v0860.png` e o manifesto com imagens comuns e maskable. Os arquivos anteriores são mantidos para clientes com páginas em cache.
 
-Na versão 0.8.6.1, o favicon da aba volta à imagem exata usada antes da 0.8.6.0: `assets/favicon-16-v0861.png`. `favicon.ico` contém a mesma imagem. A nova URL renova a referência do cache.
+O protocolo de incorporação valida origem, fonte e nonce. A URL `/exec` aponta à implantação existente; publicar este host não implanta o Google Apps Script.
 
-Os ícones de instalação continuam com o policial voltado à direita. O manifesto mantém imagens comuns e maskable separadas; o launcher define o recorte final. Os arquivos anteriores permanecem disponíveis para páginas em cache. Não há armazenamento offline de dados nem service worker neste host.
+## Abertura em navegador normal — 0.8.6.1-r2
 
-## Correção de abertura 0.8.6.1-r1
+[Acesso atualizado](https://appdrso.github.io/acesso.html?v=0.8.6.1-r2). O parâmetro de versão cria uma entrada distinta no cache HTTP, sem exigir limpeza dos dados do navegador.
 
-O acesso usa o endereço canônico com `authuser=0`. Se a página Google não iniciar o DRSO em 20 segundos, navegadores compatíveis tentam uma vez em um novo contexto sem os cookies Google existentes. A confirmação de origem, janela e nonce permanece obrigatória.
+O iframe usa o endereço canônico `/macros/s/.../exec?authuser=0&embed=1`. Nos navegadores compatíveis, recebe `credentialless` **antes da primeira navegação**, separando a abertura dos cookies das contas Google já conectadas. A r1 aguardava 20 segundos antes de fazer isso. O acesso `/?recuperar=1` continua compatível, agora com o mesmo comportamento da entrada comum.
 
-[Acesso de recuperação imediata](https://appdrso.github.io/?recuperar=1). Esse modo tem armazenamento temporário e pode pedir novo login ao recarregar. A abertura normal preserva sua sessão. Não é necessário atualizar o Apps Script para aplicar esta correção do host.
+O isolamento é temporário: recarregar pode exigir novo login no DRSO. Ele não desconecta contas Google, não altera as senhas e não dispensa a autenticação própria do DRSO. Navegadores sem esse recurso conservam a abertura canônica e o botão de nova tentativa; não há promessa de isolamento neles.
+
+Somente a confirmação do DRSO, com origem, janela e nonce válidos, encerra o acompanhamento da abertura. Uma indisponibilidade mostra os controles após 20 segundos; não inicia ciclos automáticos. O botão **Tentar novamente** cria outro iframe e recusa mensagens do quadro removido.
+
+`scripts/persistent-access-audit.cjs` exercita um perfil Chromium persistente, reaberto com cookie sintético e cache HTTP real. O teste não intercepta requisições. Uma simulação HTTPS mede os cookies recebidos no servidor e a abertura por endereço versionado. A conferência pública acessa apenas os logins USER/ADMIN, sem enviar formulários.
+
+Demonstrações antigas não fazem parte do host. A prévia atual é gerada em `delivery/` com dados fictícios.

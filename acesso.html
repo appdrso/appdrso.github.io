@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
   <meta name="referrer" content="no-referrer">
   <meta name="robots" content="noindex, nofollow">
-  <meta name="drso-access-version" content="0.8.6.1-r1">
+  <meta name="drso-access-version" content="0.8.6.1-r2">
   <meta name="theme-color" content="#113b30">
   <title>DRSO — Gestão de Voluntariedade</title>
   <meta name="apple-mobile-web-app-title" content="DRSO">
@@ -74,7 +74,6 @@
       var approved = null;
       var timeout = null;
       var ready = false;
-      var recoveryAttempted = false;
       var generation = 0;
       // An explicit account hint avoids Google's remembered /u/1/ route.
       // Authentication inside DRSO still uses its own matrícula/password.
@@ -163,14 +162,6 @@
         window.clearTimeout(timeout);
         timeout = window.setTimeout(function () {
           if (ready || attempt !== generation) return;
-          // A Google error page cannot send HELLO. Retry once without the
-          // existing Google cookies; preserve an app that has already started.
-          if (!approved && !recoveryAttempted && 'credentialless' in frame) {
-            recoveryAttempted = true;
-            replaceFrame(true);
-            showFallback('Reconectando ao DRSO', 'Estamos tentando abrir o aplicativo novamente. Aguarde alguns instantes.');
-            return;
-          }
           showFallback('Não foi possível abrir o DRSO', 'Tente novamente ou use o acesso direto pelo Google.');
         }, 20000);
       }
@@ -193,17 +184,16 @@
       document.getElementById('retry-link').addEventListener('click', function (event) {
         event.preventDefault();
         if (ready) return;
-        recoveryAttempted = true;
         replaceFrame('credentialless' in frame);
         showFallback('Reconectando ao DRSO', 'Aguarde enquanto o aplicativo é aberto novamente.');
       });
 
-      // LOAD also fires for Google error pages. Only the app's nonce-bound
-      // READY cancels recovery. A healthy session is never made ephemeral.
-      if (new URLSearchParams(window.location.search).get('recuperar') === '1' && 'credentialless' in frame) {
-        recoveryAttempted = true;
-        frame.setAttribute('credentialless', '');
-      }
+      // Start without the browser's existing Google account cookies. Waiting
+      // for a failed account-bound request exposed Google's error page first.
+      // Nested Google frames inherit this partition. DRSO still requires its
+      // own login; refreshing the host starts a new temporary session.
+      // Browsers without support retain the canonical URL and manual retry.
+      if ('credentialless' in frame) frame.setAttribute('credentialless', '');
       watchStartup();
       frame.src = EMBED_URL;
     }());
