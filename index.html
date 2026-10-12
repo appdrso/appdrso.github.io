@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
   <meta name="referrer" content="no-referrer">
   <meta name="robots" content="noindex, nofollow">
+  <meta name="drso-access-version" content="0.8.6.1-r1">
   <meta name="theme-color" content="#113b30">
   <title>DRSO — Gestão de Voluntariedade</title>
   <meta name="apple-mobile-web-app-title" content="DRSO">
@@ -57,8 +58,8 @@
     <h1 id="status-title">O aplicativo está demorando para carregar</h1>
     <p id="status-message">Você pode aguardar ou tentar abrir novamente.</p>
     <div class="actions">
-      <a id="retry-link" href="https://appdrso.github.io/" target="_top">Recarregar</a>
-      <a id="direct-link" href="https://script.google.com/macros/s/AKfycbzUTpcAv8pB1Je0YexaMLozmBg5_H90lpj4FZGD2HDTdAxfmd36-qBFVGBGFz11cOqo/exec" target="_blank" rel="noopener noreferrer" referrerpolicy="no-referrer">Abrir no Google</a>
+      <a id="retry-link" href="https://appdrso.github.io/" target="_top">Tentar novamente</a>
+      <a id="direct-link" href="https://script.google.com/macros/s/AKfycbzUTpcAv8pB1Je0YexaMLozmBg5_H90lpj4FZGD2HDTdAxfmd36-qBFVGBGFz11cOqo/exec?authuser=0" target="_blank" rel="noopener noreferrer" referrerpolicy="no-referrer">Abrir no Google</a>
     </div>
   </aside>
   <noscript><p class="no-script">Ative o JavaScript no navegador para abrir o aplicativo.</p></noscript>
@@ -72,6 +73,12 @@
       var status = document.getElementById('embed-status');
       var approved = null;
       var timeout = null;
+      var ready = false;
+      var recoveryAttempted = false;
+      var generation = 0;
+      // An explicit account hint avoids Google's remembered /u/1/ route.
+      // Authentication inside DRSO still uses its own matrícula/password.
+      var EMBED_URL = APP_URL + '?authuser=0&embed=1';
 
       function showFallback(title, message) {
         document.getElementById('status-title').textContent = title;
@@ -145,17 +152,60 @@
 
         if (!approved || event.source !== approved.source || event.origin !== approved.origin ||
             data.nonce !== approved.nonce) return;
+        ready = true;
         window.clearTimeout(timeout);
         frame.removeAttribute('aria-busy');
         status.hidden = true;
       });
 
-      // A load event also fires for some blocked frames. Only the application's
-      // nonce-bound READY message confirms startup and cancels recovery UI.
-      timeout = window.setTimeout(function () {
-        showFallback('O acesso está demorando', 'Você pode aguardar mais um pouco ou abrir o aplicativo pelo botão abaixo.');
-      }, 20000);
-      frame.src = APP_URL + '?embed=1';
+      function watchStartup() {
+        var attempt = ++generation;
+        window.clearTimeout(timeout);
+        timeout = window.setTimeout(function () {
+          if (ready || attempt !== generation) return;
+          // A Google error page cannot send HELLO. Retry once without the
+          // existing Google cookies; preserve an app that has already started.
+          if (!approved && !recoveryAttempted && 'credentialless' in frame) {
+            recoveryAttempted = true;
+            replaceFrame(true);
+            showFallback('Reconectando ao DRSO', 'Estamos tentando abrir o aplicativo novamente. Aguarde alguns instantes.');
+            return;
+          }
+          showFallback('Não foi possível abrir o DRSO', 'Tente novamente ou use o acesso direto pelo Google.');
+        }, 20000);
+      }
+
+      function replaceFrame(isolated) {
+        // A new element gives this attempt a new WindowProxy. Messages from
+        // the removed context cannot satisfy containsSender or a prior nonce.
+        var next = frame.cloneNode(false);
+        next.removeAttribute('src');
+        if (isolated) next.setAttribute('credentialless', '');
+        next.setAttribute('aria-busy', 'true');
+        approved = null;
+        ready = false;
+        frame.replaceWith(next);
+        frame = next;
+        watchStartup();
+        frame.src = EMBED_URL;
+      }
+
+      document.getElementById('retry-link').addEventListener('click', function (event) {
+        event.preventDefault();
+        if (ready) return;
+        recoveryAttempted = true;
+        replaceFrame('credentialless' in frame);
+        showFallback('Reconectando ao DRSO', 'Aguarde enquanto o aplicativo é aberto novamente.');
+      });
+
+      // LOAD also fires for Google error pages. Only the app's nonce-bound
+      // READY cancels recovery. A healthy session is never made ephemeral.
+      if (new URLSearchParams(window.location.search).get('recuperar') === '1' && 'credentialless' in frame) {
+        recoveryAttempted = true;
+        frame.setAttribute('credentialless', '');
+      }
+      watchStartup();
+      frame.src = EMBED_URL;
     }());
   </script>
 </body>
