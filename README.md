@@ -2,13 +2,13 @@
 
 Espelho dos dois pontos de entrada de `appdrso/appdrso.github.io`. Ambos devem ter o mesmo conteúdo.
 
-O favicon ativo é `assets/favicon-16-v0861.png`: cópia exata do PNG incorporado no HTML anterior à edição 0.8.6.0. `favicon.ico` contém essa mesma imagem. Os ícones de instalação permanecem na família `v0860`, incluindo `assets/apple-touch-icon-v0860.png` e o manifesto com imagens comuns e maskable. Os arquivos anteriores são mantidos para clientes com páginas em cache.
+Os favicons ativos são `assets/favicon-16-v0862.png`, `assets/favicon-32-v0862.png` e `assets/favicon-64-v0862.png`: cópias dos arquivos aprovados com o policial voltado à direita. `favicon.ico` contém as três imagens, sem reamostragem. Os ícones de instalação permanecem na família `v0860`. Os arquivos anteriores são mantidos para clientes com páginas em cache.
 
 O protocolo de incorporação valida origem, fonte e nonce. A URL `/exec` aponta à implantação existente; publicar este host não implanta o Google Apps Script.
 
-## Abertura em navegador normal — 0.8.6.1-r2
+## Abertura em navegador normal — 0.8.6.2
 
-[Acesso atualizado](https://appdrso.github.io/acesso.html?v=0.8.6.1-r2). O parâmetro de versão cria uma entrada distinta no cache HTTP, sem exigir limpeza dos dados do navegador.
+[Acesso atualizado](https://appdrso.github.io/acesso.html?v=0.8.6.2). O parâmetro de versão cria uma entrada distinta no cache HTTP, sem exigir limpeza dos dados do navegador.
 
 O iframe usa o endereço canônico `/macros/s/.../exec?authuser=0&embed=1`. Nos navegadores compatíveis, recebe `credentialless` **antes da primeira navegação**, separando a abertura dos cookies das contas Google já conectadas. A r1 aguardava 20 segundos antes de fazer isso. O acesso `/?recuperar=1` continua compatível, agora com o mesmo comportamento da entrada comum.
 
