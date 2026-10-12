@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
   <meta name="referrer" content="no-referrer">
   <meta name="robots" content="noindex, nofollow">
-  <meta name="drso-access-version" content="0.8.6.6">
+  <meta name="drso-access-version" content="0.8.6.8">
   <meta name="theme-color" content="#113b30">
   <title>DRSO — Gestão de Voluntariedade</title>
   <meta name="apple-mobile-web-app-title" content="DRSO">
@@ -165,21 +165,19 @@
         return false;
       }
 
+      try { window.localStorage.removeItem('drso.registration'); } catch (error) {}
+
       window.addEventListener('message', function (event) {
         var data = event.data;
         if (!data || typeof data !== 'object' || Array.isArray(data) || data.version !== 1 ||
             typeof data.nonce !== 'string' || !/^[0-9a-f]{32}$/.test(data.nonce) ||
-            (data.type !== 'drso:embed:hello' && data.type !== 'drso:embed:ready' && data.type !== 'drso:registration:remember') ||
+            (data.type !== 'drso:embed:hello' && data.type !== 'drso:embed:ready') ||
             !googleOrigin(event.origin) || !containsSender(event.source)) return;
 
         if (data.type === 'drso:embed:hello') {
           approved = {source: event.source, origin: event.origin, nonce: data.nonce, ready: false};
           try {
             var allowance = {type: 'drso:embed:allow', version: 1, nonce: data.nonce};
-            try {
-              var registration = window.localStorage.getItem('drso.registration');
-              if (typeof registration === 'string' && /^[0-9]{5,8}$/.test(registration)) allowance.registration = registration;
-            } catch (error) { /* The login also works without device storage. */ }
             event.source.postMessage(allowance, event.origin);
           } catch (error) { approved = null; }
           return;
@@ -187,11 +185,6 @@
 
         if (!approved || event.source !== approved.source || event.origin !== approved.origin ||
             data.nonce !== approved.nonce) return;
-        if (data.type === 'drso:registration:remember') {
-          if (!approved.ready || typeof data.registration !== 'string' || !/^[0-9]{5,8}$/.test(data.registration)) return;
-          try { window.localStorage.setItem('drso.registration', data.registration); } catch (error) { /* Optional device convenience. */ }
-          return;
-        }
         approved.ready = true;
         ready = true;
         window.clearTimeout(timeout);
