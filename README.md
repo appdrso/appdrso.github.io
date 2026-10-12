@@ -1,6 +1,6 @@
 # Host público DRSO
 
-Espelho dos dois pontos de entrada de `appdrso/appdrso.github.io`. Ambos devem ter o mesmo conteúdo.
+Espelho dos dois pontos de entrada de `appdrso5crpm/appdrso5crpm.github.io`. Ambos devem ter o mesmo conteúdo.
 
 Os favicons ativos são `assets/favicon-16-v0863.png`, `assets/favicon-32-v0863.png` e `assets/favicon-64-v0863.png`: derivados da marca aprovada com o policial voltado à direita, com enquadramento circular de 220 × 220 px para eliminar a margem que diminuía o desenho na aba. `favicon.ico` contém as três imagens, nos respectivos tamanhos nativos. Os ícones de instalação permanecem na família `v0860`. Os arquivos anteriores são mantidos para clientes com páginas em cache.
 
