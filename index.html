@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
   <meta name="referrer" content="no-referrer">
   <meta name="robots" content="noindex, nofollow">
-  <meta name="drso-access-version" content="0.8.6.3">
+  <meta name="drso-access-version" content="0.8.6.4">
   <meta name="theme-color" content="#113b30">
   <title>DRSO — Gestão de Voluntariedade</title>
   <meta name="apple-mobile-web-app-title" content="DRSO">
@@ -16,11 +16,19 @@
   <link rel="manifest" href="/manifest.webmanifest">
   <style>
     :root { color-scheme: light; font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; color: #173e32; background: #f4f6f5; }
-    html, body { touch-action: pan-x pan-y; }
+    html, body { position: fixed; inset: 0; width: 100%; height: 100%; overflow: hidden; overscroll-behavior: none; touch-action: pan-x pan-y; }
     * { box-sizing: border-box; }
     [hidden] { display: none !important; }
-    body { margin: 0; min-height: 100vh; min-height: 100svh; overflow: hidden; }
-    #app-frame { position: fixed; inset: 0; width: 100%; height: 100%; height: 100dvh; border: 0; background: #f4f6f5; }
+    body { margin: 0; }
+    #app-frame { position: fixed; inset: 0; width: 100%; height: 100%; height: var(--entry-height, 100dvh); border: 0; background: #f4f6f5; }
+    #entry-splash { position: fixed; z-index: 1; inset: 0; height: var(--entry-height, 100dvh); display: flex; flex-direction: column; align-items: center; justify-content: center; background: #f3f5f2; text-align: center; }
+    .entry-loader { position: relative; display: grid; place-items: center; width: 116px; height: 116px; margin-bottom: 24px; }
+    .entry-mark { position: relative; display: block; width: 88px; height: 88px; overflow: hidden; border-radius: 50%; }
+    .entry-mark img { position: absolute; display: block; width: 116.364%; height: 116.364%; max-width: none; left: 50%; top: 50%; transform: translate(-50%, -50%); }
+    .entry-loader-ring { position: absolute; inset: 0; border: 2px solid #dce4dc; border-top-color: #113b30; border-right-color: #b69a60; border-radius: 50%; animation: entry-spin 1.25s linear infinite; }
+    .entry-name { margin-bottom: 8px; font-size: 24px; letter-spacing: .12em; }
+    @keyframes entry-spin { to { transform: rotate(360deg); } }
+    @media (prefers-reduced-motion: reduce) { .entry-loader-ring { animation: none; } }
     #embed-status, .no-script { position: fixed; z-index: 2; left: 16px; right: 16px; bottom: max(16px, env(safe-area-inset-bottom)); max-width: 440px; margin: 0 auto; padding: 20px; border: 1px solid #deded3; border-radius: 14px; background: #fff; box-shadow: 0 8px 32px #173e3220; }
     h1 { margin: 0 0 8px; font-size: 18px; line-height: 1.35; }
     p { margin: 0 0 12px; color: #596b63; font-size: 14px; line-height: 1.5; }
@@ -56,6 +64,10 @@
   </script>
 </head>
 <body>
+  <div id="entry-splash" role="status" aria-live="polite">
+    <div class="entry-loader" aria-hidden="true"><span class="entry-mark"><img src="/assets/drso-mark-v0864.png" alt="" width="256" height="256"></span><span class="entry-loader-ring"></span></div>
+    <strong class="entry-name">DRSO</strong><p>Abrindo o DRSO…</p>
+  </div>
   <aside id="embed-status" hidden role="status" aria-live="polite" aria-atomic="true">
     <h1 id="status-title">O aplicativo está demorando para carregar</h1>
     <p id="status-message">Você pode aguardar ou tentar abrir novamente.</p>
@@ -73,6 +85,7 @@
       var APP_URL = 'https://script.google.com/macros/s/AKfycbzUTpcAv8pB1Je0YexaMLozmBg5_H90lpj4FZGD2HDTdAxfmd36-qBFVGBGFz11cOqo/exec';
       var frame = document.getElementById('app-frame');
       var status = document.getElementById('embed-status');
+      var splash = document.getElementById('entry-splash');
       var approved = null;
       var timeout = null;
       var ready = false;
@@ -81,10 +94,22 @@
       // Authentication inside DRSO still uses its own matrícula/password.
       var EMBED_URL = APP_URL + '?authuser=0&embed=1';
 
+      // Only the top-level visual viewport reports the space taken by the
+      // on-screen keyboard. Resize the iframe so its own form can scroll.
+      function fitViewport() {
+        var viewport = window.visualViewport;
+        var height = viewport && viewport.scale === 1 ? Math.min(viewport.height, window.innerHeight) : window.innerHeight;
+        if (height > 0) document.documentElement.style.setProperty('--entry-height', height + 'px');
+      }
+      window.addEventListener('resize', fitViewport);
+      if (window.visualViewport) window.visualViewport.addEventListener('resize', fitViewport);
+      fitViewport();
+
       function showFallback(title, message) {
         document.getElementById('status-title').textContent = title;
         document.getElementById('status-message').textContent = message;
         status.hidden = false;
+        splash.hidden = true;
       }
 
       // A copied or itself embedded host must not approve the application's
@@ -94,8 +119,7 @@
         return;
       }
 
-      // The app controls its own trusted startup. Give its iframe the full
-      // viewport immediately instead of inserting a separate landing page.
+      // Keep the iframe at its real size behind the temporary loading graphic.
       frame.hidden = false;
       frame.removeAttribute('aria-hidden');
       frame.setAttribute('aria-busy', 'true');
@@ -157,6 +181,7 @@
         window.clearTimeout(timeout);
         frame.removeAttribute('aria-busy');
         status.hidden = true;
+        splash.hidden = true;
       });
 
       function watchStartup() {

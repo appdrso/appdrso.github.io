@@ -8,9 +8,9 @@ Para regenerar os favicons, execute `node scripts/build-favicons.cjs` com ImageM
 
 O protocolo de incorporação valida origem, fonte e nonce. A URL `/exec` aponta à implantação existente; publicar este host não implanta o Google Apps Script.
 
-## Abertura em navegador normal — 0.8.6.3
+## Abertura em navegador normal — 0.8.6.4
 
-[Acesso atualizado](https://appdrso.github.io/acesso.html?v=0.8.6.3). O parâmetro de versão cria uma entrada distinta no cache HTTP, sem exigir limpeza dos dados do navegador.
+[Acesso atualizado](https://appdrso.github.io/acesso.html?v=0.8.6.4). O parâmetro de versão cria uma entrada distinta no cache HTTP, sem exigir limpeza dos dados do navegador.
 
 O iframe usa o endereço canônico `/macros/s/.../exec?authuser=0&embed=1`. Nos navegadores compatíveis, recebe `credentialless` **antes da primeira navegação**, separando a abertura dos cookies das contas Google já conectadas. A r1 aguardava 20 segundos antes de fazer isso. O acesso `/?recuperar=1` continua compatível, agora com o mesmo comportamento da entrada comum.
 
@@ -21,3 +21,5 @@ Somente a confirmação do DRSO, com origem, janela e nonce válidos, encerra o 
 `scripts/persistent-access-audit.cjs` exercita um perfil Chromium persistente, reaberto com cookie sintético e cache HTTP real. O teste não intercepta requisições. Uma simulação HTTPS mede os cookies recebidos no servidor e a abertura por endereço versionado. A conferência pública acessa apenas os logins USER/ADMIN, sem enviar formulários.
 
 Demonstrações antigas não fazem parte do host. A prévia atual é gerada em `delivery/` com dados fictícios.
+
+A versão 0.8.6.4 mostra a marca DRSO e um anel de carregamento até a confirmação do aplicativo. A margem transparente da imagem original é enquadrada por CSS, sem redesenhar a arte. A animação respeita a preferência por movimento reduzido. O host acompanha a altura do viewport visual para disponibilizar ao formulário o espaço restante quando o teclado abre.
