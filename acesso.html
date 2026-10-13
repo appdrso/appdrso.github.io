@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
   <meta name="referrer" content="no-referrer">
   <meta name="robots" content="noindex, nofollow">
-  <meta name="drso-access-version" content="0.8.6.16">
+  <meta name="drso-access-version" content="0.8.6.17">
   <meta name="theme-color" content="#113b30">
   <title>DRSO — Gestão de Voluntariedade</title>
   <meta name="apple-mobile-web-app-title" content="DRSO">
@@ -34,7 +34,7 @@
 .entry-progress{display:block;position:relative;width:136px;height:3px;overflow:hidden;border-radius:3px;background:#c7d5c92b}
 .entry-loader-ring{display:block;position:absolute;inset:0 auto 0 0;width:48%;border-radius:inherit;background:linear-gradient(90deg,#b99c60,#eed29a);animation:entry-progress 1.5s ease-in-out infinite}
 .entry-splash .entry-message{margin:14px 0 0;color:#bdcdc2;font-size:12px;line-height:1.5}
-.entry-splash .entry-footer{position:absolute;bottom:max(26px,env(safe-area-inset-bottom));left:24px;right:24px;margin:0;color:#adbdaf;font-size:10px;line-height:1.7;letter-spacing:.06em;text-transform:uppercase}
+.entry-splash .entry-footer{position:absolute;bottom:max(20px,env(safe-area-inset-bottom));left:max(18px,env(safe-area-inset-left));right:max(18px,env(safe-area-inset-right));display:flex;align-items:center;justify-content:space-between;gap:12px;margin:0;padding:0;border:0;background:transparent;color:#bdcbbf;font-size:10px;line-height:1.5;letter-spacing:0;text-transform:none}.entry-splash .entry-footer span{white-space:nowrap}
 @keyframes entry-progress{0%{transform:translateX(-105%)}100%{transform:translateX(215%)}}
 @media(max-height:480px){.entry-splash{padding:52px 20px 44px}.entry-splash .entry-unit{top:14px}.entry-splash .entry-loader{width:64px;height:64px;margin-bottom:12px}.entry-splash .entry-mark{width:64px;height:64px}.entry-splash .entry-name{font-size:32px}.entry-splash .entry-tagline{margin:6px 0 16px}.entry-splash .entry-footer{bottom:12px}}
 @media(prefers-reduced-motion:reduce){.entry-loader-ring{animation:none;left:25%;opacity:.85}}
@@ -76,7 +76,7 @@
   </script>
 </head>
 <body>
-  <div id="entry-splash" class="entry-splash" role="status" aria-live="polite"><p class="entry-unit">5º CRPM · Capital Leste</p><div class="entry-loader" aria-hidden="true"><span class="entry-mark"><img src="/assets/drso-mark-v0864.png" alt="" width="256" height="256"></span></div><strong class="entry-name">DRSO<span>.</span></strong><p class="entry-tagline">Voluntariedade · Serviços extras</p><span class="entry-progress" aria-hidden="true"><span class="entry-loader-ring"></span></span><p class="entry-message">Abrindo o DRSO…</p><p class="entry-footer">Polícia Militar do Ceará<br>19º Batalhão</p></div>
+  <div id="entry-splash" class="entry-splash" role="status" aria-live="polite"><p class="entry-unit">5º CRPM · Capital Leste</p><div class="entry-loader" aria-hidden="true"><span class="entry-mark"><img src="/assets/drso-mark-v0864.png" alt="" width="256" height="256"></span></div><strong class="entry-name">DRSO<span>.</span></strong><p class="entry-tagline">Voluntariedade · Serviços extras</p><span class="entry-progress" aria-hidden="true"><span class="entry-loader-ring"></span></span><p class="entry-message">Abrindo o DRSO…</p><footer class="entry-footer"><span>DRSO v0.8.6.17</span><span>© 2026 – 19º BPM</span></footer></div>
   <aside id="embed-status" hidden role="status" aria-live="polite" aria-atomic="true">
     <h1 id="status-title">O aplicativo está demorando para carregar</h1>
     <p id="status-message">Você pode aguardar ou tentar abrir novamente.</p>
